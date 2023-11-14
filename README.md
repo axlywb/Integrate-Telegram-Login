@@ -7,4 +7,11 @@ this is a basic example, and in a production environment, it is still necessary 
 
 Replace `'YOUR_TELEGRAM_BOT_TOKEN'` and `'YOUR_SECRET'` with the actual Telegram bot token and secret key. Additionally, customize routes and user handling logic according to application needs.
 
-that this example contains a unifying scenario. In real-world applications, it is still necessary to consider security, error handling, and the possibility of storing user information in a database.
+that this example contains a unifying scenario. In real-world applications, it is still necessary to consider security, error handling, and the 
+possibility of storing user information in a database.
+
+# Make sure to install the required npm packages:
+
+```bash
+npm install express passport passport-telegram-official express-session
+```
