@@ -1,0 +1,73 @@
+```javascript
+const express = require('express');
+const passport = require('passport');
+const TelegramStrategy = require('passport-telegram-official').Strategy;
+
+const app = express();
+const port = 3000;
+
+// Replace 'YOUR_TELEGRAM_BOT_TOKEN' and 'YOUR_SECRET' with your actual Telegram bot token and a secret key.
+const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN';
+const SECRET_KEY = 'YOUR_SECRET';
+
+// Set up Telegram strategy for Passport
+passport.use(new TelegramStrategy({
+    botToken: TELEGRAM_BOT_TOKEN,
+    clientID: TELEGRAM_BOT_TOKEN, // Use the bot token as the client ID
+    clientSecret: SECRET_KEY,
+    callbackURL: `http://localhost:${port}/auth/telegram/callback`,
+    passReqToCallback: true
+},
+(req, message, profile, done) => {
+    // 'profile' contains user information obtained from Telegram
+    return done(null, profile);
+}));
+
+// Serialize and deserialize user information
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+// Initialize Passport and restore authentication state from session
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Define routes
+app.get('/', (req, res) => res.send('Home'));
+
+// Redirect to Telegram for authentication
+app.get('/auth/telegram',
+    passport.authenticate('telegram'));
+
+// Telegram callback URL after successful authentication
+app.get('/auth/telegram/callback',
+    passport.authenticate('telegram', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+    }));
+
+// Logout and redirect to home
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
+// Display user information if authenticated
+app.get('/profile', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.send(`<h1>Hello ${req.user.username}</h1><a href="/logout">Logout</a>`);
+    } else {
+        res.redirect('/');
+    }
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+});
+```
+
+# Make sure to install the required npm packages:
+
+```bash
+npm install express passport passport-telegram-official express-session
+```
